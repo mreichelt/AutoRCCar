@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 __author__ = 'zhengwang'
 
 import serial
@@ -64,6 +65,7 @@ class RCTest(object):
 
                 elif event.type == pygame.KEYUP:
                     self.ser.write(bytes([0]))
+
 
 if __name__ == '__main__':
     RCTest()

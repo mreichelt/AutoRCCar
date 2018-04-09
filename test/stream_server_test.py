@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from array_util import find_subarray
+
 __author__ = 'zhengwang'
 
 import numpy as np
@@ -6,11 +8,7 @@ import cv2
 import socket
 
 
-def find_subarray(array, subarray):
-    arr = [x for x in range(len(array)) if array[x:x+len(subarray)] == subarray]
-    if len(arr) == 0:
-        return -1
-    return arr[0]
+
 
 class VideoStreamingTest(object):
     def __init__(self):
@@ -32,7 +30,7 @@ class VideoStreamingTest(object):
             stream_bytes = []
             while True:
                 stream_bytes += self.connection.read(1024)
-                first = find_subarray(stream_bytes, [0xff,0xd8])
+                first = find_subarray(stream_bytes, [0xff, 0xd8])
                 last = find_subarray(stream_bytes, [0xff, 0xd9])
                 if first != -1 and last != -1:
                     jpg = stream_bytes[first:last + 2]
@@ -46,6 +44,7 @@ class VideoStreamingTest(object):
         finally:
             self.connection.close()
             self.server_socket.close()
+
 
 if __name__ == '__main__':
     VideoStreamingTest()
