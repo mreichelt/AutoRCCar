@@ -1,3 +1,4 @@
+from random_util import get_my_ip
 from serial_util import select_usbmodem
 from array_util import find_subarray
 
@@ -11,22 +12,6 @@ from pygame.locals import *
 import socket
 import time
 import os
-
-
-def get_my_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # doesn't even have to be reachable
-        s.connect(('10.255.255.255', 1))
-        ip = s.getsockname()[0]
-    except:
-        ip = '127.0.0.1'
-    finally:
-        s.close()
-    return ip
-
-
-COLOR_DIMENSIONS = 3
 
 
 class CollectTrainingData(object):
@@ -64,7 +49,7 @@ class CollectTrainingData(object):
         # collect images for training
         print('Start collecting images...')
         e1 = cv2.getTickCount()
-        image_array = np.zeros((1, 38400, COLOR_DIMENSIONS))
+        image_array = np.zeros((1, 38400))
         label_array = np.zeros((1, 4), 'float')
 
         # stream video frames one by one
@@ -78,7 +63,7 @@ class CollectTrainingData(object):
                 if first != -1 and last != -1:
                     jpg = stream_bytes[first:last + 2]
                     stream_bytes = stream_bytes[last + 2:]
-                    image = cv2.imdecode(np.array(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    image = cv2.imdecode(np.array(jpg, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
                     # select lower half of the image
                     roi = image[120:240, :]
 
@@ -89,7 +74,7 @@ class CollectTrainingData(object):
                     cv2.imshow('image', image)
 
                     # reshape the roi image into one row array
-                    temp_array = roi.reshape(1, 38400, COLOR_DIMENSIONS).astype(np.float32)
+                    temp_array = roi.reshape(1, 38400).astype(np.float32)
 
                     frame += 1
                     total_frame += 1
