@@ -1,20 +1,19 @@
 """
 Reference:
-Ultrasonic Distance Measurement Using Python – Part 2
+Ultrasonic Distance Measurement Using Python - Part 2
 http://www.raspberrypi-spy.co.uk/2013/01/ultrasonic-distance-measurement-using-python-part-2/
-    
 """
 
 from socket import *
 import time
 import RPi.GPIO as GPIO
 
-
 GPIO.setwarnings(False)
 
 # create a socket and bind socket to the host
 client_socket = socket(AF_INET, SOCK_STREAM)
-client_socket.connect(('192.168.1.100', 8002))
+client_socket.connect((raw_input('To which IP address should i send? '), 8002))
+
 
 def measure():
     """
@@ -24,29 +23,31 @@ def measure():
     time.sleep(0.00001)
     GPIO.output(GPIO_TRIGGER, False)
     start = time.time()
+    stop = start
 
-    while GPIO.input(GPIO_ECHO)==0:
+    while GPIO.input(GPIO_ECHO) == 0:
         start = time.time()
 
-    while GPIO.input(GPIO_ECHO)==1:
+    while GPIO.input(GPIO_ECHO) == 1:
         stop = time.time()
 
-    elapsed = stop-start
-    distance = (elapsed * 34300)/2
+    elapsed = stop - start
+    distance = (elapsed * 34300) / 2
 
     return distance
+
 
 # referring to the pins by GPIO numbers
 GPIO.setmode(GPIO.BCM)
 
 # define pi GPIO
-GPIO_TRIGGER = 23
-GPIO_ECHO    = 24
+GPIO_TRIGGER = 18
+GPIO_ECHO = 24
 
 # output pin: Trigger
-GPIO.setup(GPIO_TRIGGER,GPIO.OUT)
+GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 # input pin: Echo
-GPIO.setup(GPIO_ECHO,GPIO.IN)
+GPIO.setup(GPIO_ECHO, GPIO.IN)
 # initialize trigger pin to low
 GPIO.output(GPIO_TRIGGER, False)
 
@@ -56,7 +57,7 @@ try:
         print "Distance : %.1f cm" % distance
         # send data to the host every 0.5 sec
         client_socket.send(str(distance))
-        time.sleep(0.5)
+        time.sleep(0.8)
 finally:
     client_socket.close()
     GPIO.cleanup()
