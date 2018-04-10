@@ -8,7 +8,17 @@ See self-driving in action
 " target="_blank"><img src="http://img.youtube.com/vi/BBwEF6WBUQs/0.jpg" width="360" height="240" border="10" /></a>
 
   A scaled down version of self-driving system using a RC car, Raspberry Pi, Arduino and open source software. The system uses a Raspberry Pi with a camera and an ultrasonic sensor as inputs, a processing computer that handles steering, object recognition (stop sign and traffic light) and distance measurement, and an Arduino board for RC car control.
-  
+
+### Install instructions (Mac OS X)
+
+```bash
+# make sure you have Python 3 installed (e.g. via Homebrew)
+pip3 install virtualenv
+python3.6 -m virtualenv venv # create virtual environment (you can add this in PyCharm)
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Dependencies
 * Raspberry Pi: 
   - Picamera
