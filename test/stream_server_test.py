@@ -8,8 +8,6 @@ import cv2
 import socket
 
 
-
-
 class VideoStreamingTest(object):
     def __init__(self):
 
