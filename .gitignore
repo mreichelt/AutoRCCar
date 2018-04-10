@@ -3,3 +3,6 @@
 venv/
 
 
+computer/mlp_xml/mlp.xml
+computer/training_data/*.npz
+computer/training_images/*.jpg
