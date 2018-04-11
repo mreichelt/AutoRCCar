@@ -6,3 +6,5 @@ iso8601
 opencv-python
 scikit-learn
 scipy
+keras
+tensorflow
