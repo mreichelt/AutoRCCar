@@ -7,13 +7,12 @@ import numpy as np
 import pygame
 import glob
 
+NUM_KEYS = [getattr(pygame, 'K_' + str(num)) for num in range(10)]
+
 
 def main():
     image_array = np.zeros((1, 38400))
-    label_array = np.zeros((1, 4), 'float')
-    identity = np.zeros((4, 4), 'float')
-    for i in range(4):
-        identity[i, i] = 1
+    label_array = np.zeros((1, 1), 'float')
     pygame.init()
     for image in glob.glob('training_images/*.jpg'):
         image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
@@ -26,7 +25,7 @@ def main():
         roi = image[120:240, :]
         temp_array = roi.reshape(1, 38400).astype(np.float32)
         image_array = np.vstack((image_array, temp_array))
-        label_array = np.vstack((label_array, identity[label]))
+        label_array = np.vstack((label_array, np.array(label, 'float')))
     save(Path('training_data'), image_array, label_array)
     cv2.destroyAllWindows()
     cv2.waitKey(0)
@@ -42,14 +41,10 @@ def await_key():
     while True:
         for event in pygame.event.get(pygame.KEYDOWN):
             pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_LEFT]:
-                return 0
-            if pressed[pygame.K_UP]:
-                return 2
-            if pressed[pygame.K_RIGHT]:
-                return 1
-            if pressed[pygame.K_DOWN]:
-                return 3
+            pressed_nums = list(filter(lambda key: pressed[key], NUM_KEYS))
+            if len(pressed_nums) == 1:
+                return pressed_nums[0]
+
             if pressed[pygame.K_s]:
                 return -1
             if pressed[pygame.K_ESCAPE] or pressed[pygame.K_x] or pressed[pygame.K_q]:

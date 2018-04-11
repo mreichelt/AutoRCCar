@@ -12,7 +12,7 @@ e0 = cv2.getTickCount()
 
 # load training data
 image_array = np.zeros((1, 38400), 'float32')
-label_array = np.zeros((1, 4), 'float32')
+label_array = np.zeros((1, 1), 'float32')
 training_data = glob.glob('training_data/*.npz')
 
 # if no data, exit
@@ -43,7 +43,7 @@ train, test, train_labels, test_labels = train_test_split(X, y, test_size=0.3)
 e1 = cv2.getTickCount()
 
 # create MLP
-layer_sizes = np.int32([38400, 32, 4])
+layer_sizes = np.int32([38400, 32, 1])
 model: cv2.ml_ANN_MLP = cv2.ml.ANN_MLP_create()
 model.setLayerSizes(layer_sizes)
 model.setTermCriteria((cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, 500, 0.0001))
