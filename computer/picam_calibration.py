@@ -1,4 +1,3 @@
-
 """
 Reference:
 OpenCV-Python Tutorials - Camera Calibration and 3D Reconstruction
@@ -12,9 +11,9 @@ import glob
 # termination criteria
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-# 6x9 chess board, prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-object_point = np.zeros((6*9, 3), np.float32)
-object_point[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
+# 5x7 chess board, prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
+object_point = np.zeros((7 * 5, 3), np.float32)
+object_point[:, :2] = np.mgrid[0:7, 0:5].T.reshape(-1, 2)
 
 # 3d point in real world space
 object_points = []
@@ -30,7 +29,7 @@ for file_name in images:
     h, w = gray.shape[:2]
 
     # find chess board corners
-    ret, corners = cv2.findChessboardCorners(gray, (9, 6), None)
+    ret, corners = cv2.findChessboardCorners(gray, (7, 5), None)
 
     # add object points, image points
     if ret:
@@ -39,9 +38,9 @@ for file_name in images:
         image_points.append(corners)
 
         # draw and display the corners
-        cv2.drawChessboardCorners(image, (9, 6), corners, ret)
+        cv2.drawChessboardCorners(image, (7, 5), corners, ret)
         cv2.imshow('image', image)
-        cv2.waitKey(500)
+        # cv2.waitKey(500)
 
 # calibration
 retval, cameraMatrix, distCoeffs, rvecs, tvecs = cv2.calibrateCamera(object_points, image_points, (w, h), None, None)
@@ -57,3 +56,5 @@ print("u0:", u0)
 print("v0:", v0)
 
 cv2.destroyAllWindows()
+if __name__ == '__main__':
+    pass
