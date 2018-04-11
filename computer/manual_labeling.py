@@ -1,3 +1,4 @@
+import sys
 import time
 from pathlib import Path
 
@@ -19,7 +20,6 @@ def main():
         try:
             label = label_image(image)
         except KeyboardInterrupt:
-            save(Path('training_data'), image_array, label_array)
             break
         if label < 0:
             continue
@@ -27,6 +27,9 @@ def main():
         temp_array = roi.reshape(1, 38400).astype(np.float32)
         image_array = np.vstack((image_array, temp_array))
         label_array = np.vstack((label_array, identity[label]))
+    save(Path('training_data'), image_array, label_array)
+    cv2.destroyAllWindows()
+    cv2.waitKey(0)
 
 
 def save(path, images, labels):
