@@ -13,8 +13,7 @@ See self-driving in action
 
 ```bash
 # make sure you have Python 3 installed (e.g. via Homebrew)
-pip3 install virtualenv
-python3.6 -m virtualenv venv # create virtual environment (you can add this in PyCharm)
+python3.6 -m venv venv # create virtual environment (you can add this in PyCharm)
 source venv/bin/activate
 pip install -r requirements.txt
 ```

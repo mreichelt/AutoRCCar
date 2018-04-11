@@ -13,7 +13,7 @@ class RCTest(object):
         self.car = select_car()
         self.send_inst = True
         pygame.init()
-        print("Control with WASD = combinations")
+        print("Control with arrow keys & combinations")
         self.steer()
 
     def steer(self):
