@@ -16,7 +16,7 @@ RESET_BYTE = 0
 
 class CarControl(serial.Serial):
 
-    # Normal movement
+    # Normal movements
 
     def forward(self):
         self.write_single_byte(FORWARD_BYTE)
@@ -56,20 +56,20 @@ class CarControl(serial.Serial):
 
 
 def select_car():
-    choice = select_usbmodem()
-    return CarControl(choice, 115200, timeout=1)
+    usb_device = select_usbmodem()
+    return CarControl(usb_device, 115200, timeout=1)
 
 
 def select_usbmodem():
-    usbs = glob.glob('/dev/tty.usbmodem*')
-    print("Choose an USB post for the serial")
-    for i in range(len(usbs)):
-        print(i, usbs[i])
-    inp = -1
-    while not (0 <= inp < len(usbs)):
+    usb_devices = glob.glob('/dev/tty.usbmodem*')
+    print("Choose an USB port for the serial")
+    for i, usb_device in enumerate(usb_devices):
+        print(i, usb_device)
+    selection = -1
+    while not 0 <= selection < len(usb_devices):
         try:
-            inp = int(input())
+            selection = int(input())
         except ValueError:
             pass
 
-    return usbs[inp]
+    return usb_devices[selection]
