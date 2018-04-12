@@ -3,12 +3,10 @@ from serial_util import select_car
 
 __author__ = 'zhengwang'
 
-import threading
 import socketserver
 import cv2
 import cv2.ml
 import numpy as np
-import math
 
 sensor_data = []
 
@@ -36,10 +34,10 @@ class RCControl(object):
             self.car.forward()
             print("Forward")
         elif prediction == 0:
-            self.car.left()
+            self.car.forward_left()
             print("Left")
         elif prediction == 1:
-            self.car.right()
+            self.car.forward_right()
             print("Right")
         else:
             self.stop()
@@ -84,8 +82,8 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
                 if first != -1 and last != -1:
                     jpg = stream_bytes[first:last + 2]
                     stream_bytes = stream_bytes[last + 2:]
-                    gray = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
-                    image = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    gray = cv2.imdecode(np.array(jpg, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+                    image = cv2.imdecode(np.array(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
 
                     # lower half of the image
                     half_gray = gray[120:240, :]
@@ -100,11 +98,7 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
                     prediction = self.model.predict(image_array)
 
                     # stop conditions
-                    if sensor_data is not None and sensor_data < 30:
-                        print("Stop, obstacle in front")
-                        self.rc_car.stop()
-                    else:
-                        self.rc_car.steer(prediction)
+                    self.rc_car.steer(prediction)
 
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         self.rc_car.stop()
@@ -118,18 +112,13 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
 
 class ThreadServer(object):
 
+    @staticmethod
     def server_thread(host, port):
         server = socketserver.TCPServer((host, port), VideoStreamHandler)
         server.serve_forever()
 
-    def server_thread2(host, port):
-        server = socketserver.TCPServer((host, port), SensorDataHandler)
-        server.serve_forever()
-
-    distance_thread = threading.Thread(target=server_thread2, args=('0.0.0.0', 8002))
-    distance_thread.start()
-    video_thread = threading.Thread(target=server_thread, args=('0.0.0.0', 8000))
-    video_thread.start()
+    def __init__(self):
+        ThreadServer.server_thread('0.0.0.0', 8000)
 
 
 if __name__ == '__main__':
