@@ -1,15 +1,19 @@
-from pathlib import Path
-import cv2
-import pygame
 import glob
 import shutil
+from pathlib import Path
+
+import cv2
+import pygame
 
 NUM_KEYS = [getattr(pygame, 'K_' + str(num)) for num in range(10)]
 
 
-def main():
+def main(skip=0):
     pygame.init()
-    for file in glob.glob('training_images/*.jpg'):
+    for i, file in enumerate(sorted(glob.glob('training_images/*.jpg'))):
+        print(i, file)
+        if i < skip:
+            continue
         image = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
         try:
             label = label_image(image)

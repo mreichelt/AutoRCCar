@@ -8,3 +8,5 @@ scikit-learn
 scipy
 keras
 tensorflow
+matplotlib
+h5py
