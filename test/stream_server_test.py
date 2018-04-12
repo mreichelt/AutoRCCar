@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from array_util import find_subarray
+from random_util import get_my_ip
 
 __author__ = 'zhengwang'
 
@@ -14,6 +15,7 @@ class VideoStreamingTest(object):
         self.server_socket = socket.socket()
         self.server_socket.bind(('0.0.0.0', 8000))
         self.server_socket.listen(0)
+        print("Listening on port 8000. My IP is " + get_my_ip())
         self.connection, self.client_address = self.server_socket.accept()
         self.connection = self.connection.makefile('rb')
         self.streaming()
