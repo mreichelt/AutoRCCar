@@ -1,6 +1,6 @@
+from array_util import find_subarray_np
 from random_util import get_my_ip
 from serial_util import select_usbmodem
-from array_util import find_subarray
 
 __author__ = 'zhengwang'
 
@@ -8,10 +8,12 @@ import numpy as np
 import cv2
 import serial
 import pygame
-from pygame.locals import *
 import socket
 import time
 import os
+
+JPEG_START = np.array([0xff, 0xd8], dtype=np.uint8)
+JPED_END = np.array([0xff, 0xd9], dtype=np.uint8)
 
 
 class CollectTrainingData(object):
@@ -54,16 +56,16 @@ class CollectTrainingData(object):
 
         # stream video frames one by one
         try:
-            stream_bytes = []
+            stream_bytes = np.array([], dtype=np.uint8)
             frame = 1
             while self.send_inst:
-                stream_bytes += self.connection.read(1024)
-                first = find_subarray(stream_bytes, [0xff, 0xd8])
-                last = find_subarray(stream_bytes, [0xff, 0xd9])
-                if first != -1 and last != -1:
+                stream_bytes = np.append(stream_bytes, np.fromstring(self.connection.read(8 * 1024), dtype=np.uint8))
+                first = find_subarray_np(stream_bytes, JPEG_START)
+                last = find_subarray_np(stream_bytes, JPED_END)
+                if first is not None and last is not None:
                     jpg = stream_bytes[first:last + 2]
                     stream_bytes = stream_bytes[last + 2:]
-                    image = cv2.imdecode(np.array(jpg, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+                    image = cv2.imdecode(jpg, cv2.IMREAD_GRAYSCALE)
                     # select lower half of the image
                     roi = image[120:240, :]
 
@@ -81,7 +83,7 @@ class CollectTrainingData(object):
 
                     # get input from human driver
                     for event in pygame.event.get():
-                        if event.type == KEYDOWN:
+                        if event.type == pygame.KEYDOWN:
                             key_input = pygame.key.get_pressed()
 
                             # complex orders
