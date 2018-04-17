@@ -6,3 +6,7 @@ venv/
 computer/mlp_xml/mlp.xml
 computer/training_data/*.npz
 computer/training_images/*.jpg
+
+keras_remake/models/
+keras_remake/labeled_images/
+keras_remake/training_images/
