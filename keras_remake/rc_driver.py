@@ -1,5 +1,6 @@
 from array_util import find_subarray_np
 from keras_remake.predict import NeuralNetwork
+from random_util import get_my_ip
 from serial_util import select_car
 
 __author__ = 'zhengwang'
@@ -12,6 +13,7 @@ import numpy as np
 sensor_data = []
 
 STEER_THRESHOLD = 0.3
+GAS_INTERVAL = 3
 
 
 class RCControl(object):
@@ -19,16 +21,29 @@ class RCControl(object):
     def __init__(self):
         self.car = select_car()
 
-    def steer(self, prediction):
+    def steer(self, prediction, frame):
+        print(end=str(frame))
         if prediction < -STEER_THRESHOLD:
-            self.car.forward_left()
-            print("Left")
+            if frame % GAS_INTERVAL != 0:
+                print('left')
+                self.car.left()
+            else:
+                print('forward left')
+                self.car.forward_left()
         elif prediction > STEER_THRESHOLD:
-            self.car.forward_right()
-            print("Right")
+            if frame % GAS_INTERVAL != 0:
+                print('right')
+                self.car.right()
+            else:
+                print('forward right')
+                self.car.forward_right()
         else:
-            self.car.forward()
-            print("Forward")
+            if frame % GAS_INTERVAL != 0:
+                self.car.reset_car()
+                print("stop")
+            else:
+                self.car.forward()
+                print("Forward")
 
     def stop(self):
         self.car.reset_car()
@@ -66,10 +81,9 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
 
         # stream video frames one by one
         try:
-            frame = -1
+            frame = 0
             first = None
             while True:
-                frame += 1
                 stream_bytes = np.append(stream_bytes, np.fromstring(self.rfile.read(8 * 1024), dtype=np.uint8))
                 if first is None:
                     first = find_subarray_np(stream_bytes, JPEG_START)
@@ -82,11 +96,14 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
 
                         prediction = self.model.predict_single(gray)
 
-                        self.rc_car.steer(prediction)
+                        self.rc_car.steer(prediction, frame)
+
+                        frame += 1
 
                         first = None
 
         finally:
+            self.rc_car.stop()
             cv2.destroyAllWindows()
             print("Connection closed on thread 1")
 
@@ -103,4 +120,5 @@ class ThreadServer(object):
 
 
 if __name__ == '__main__':
+    print(get_my_ip())
     ThreadServer()

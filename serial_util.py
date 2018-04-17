@@ -1,4 +1,5 @@
 import glob
+
 import serial
 
 FORWARD_BYTE = 1
@@ -19,29 +20,37 @@ class CarControl(serial.Serial):
     # Normal movements
 
     def forward(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(FORWARD_BYTE)
 
     def reverse(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(REVERSE_BYTE)
 
     def right(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(RIGHT_BYTE)
 
     def left(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(LEFT_BYTE)
 
     # Complex movements
 
     def forward_right(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(FORWARD_RIGHT_BYTE)
 
     def forward_left(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(FORWARD_LEFT_BYTE)
 
     def reverse_right(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(REVERSE_RIGHT_BYTE)
 
     def reverse_left(self):
+        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(REVERSE_LEFT_BYTE)
 
     # Reset
@@ -62,6 +71,9 @@ def select_car():
 
 def select_usbmodem():
     usb_devices = glob.glob('/dev/tty.usbmodem*')
+    if len(usb_devices) == 0:
+        print('Only one usbdevie found: %s. Using that one.' % usb_devices[0])
+        return usb_devices[0]
     print("Choose an USB port for the serial")
     for i, usb_device in enumerate(usb_devices):
         print(i, usb_device)
