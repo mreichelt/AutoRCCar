@@ -46,7 +46,6 @@ def await_key():
                 raise KeyboardInterrupt
             if not event.type == pygame.KEYDOWN:
                 continue
-            print('Keydown')
             pressed = pygame.key.get_pressed()
             pressed_nums = list(filter(lambda key: pressed[key], NUM_KEYS))
             if len(pressed_nums) == 1:
