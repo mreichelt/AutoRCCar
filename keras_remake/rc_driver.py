@@ -20,6 +20,7 @@ class RCControl(object):
 
     def __init__(self):
         self.car = select_car()
+        self.car.start()
 
     def steer(self, prediction, frame):
         print(end=str(frame))
