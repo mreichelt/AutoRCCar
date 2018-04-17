@@ -20,12 +20,9 @@ def main(skip=0):
         except KeyboardInterrupt:
             break
 
-        if label < 0:
-            continue
-
         save(
             image=file,
-            label=chr(label),
+            label=label,
         )
 
     cv2.destroyAllWindows()
@@ -47,10 +44,11 @@ def await_key():
             pressed = pygame.key.get_pressed()
             pressed_nums = list(filter(lambda key: pressed[key], NUM_KEYS))
             if len(pressed_nums) == 1:
-                return pressed_nums[0]
-
+                return chr(pressed_nums[0])
+            if pressed[pygame.K_b]:
+                return 'brake'
             if pressed[pygame.K_s]:
-                return -1
+                return 'skip'
             if pressed[pygame.K_ESCAPE] or pressed[pygame.K_x] or pressed[pygame.K_q]:
                 raise KeyboardInterrupt
 
