@@ -21,7 +21,7 @@ void setup() {
 }
 
 void loop() {
-  //receive command
+  // receive command
   if (Serial.available() > 0){
     command = Serial.read();
   } else {
@@ -30,83 +30,69 @@ void loop() {
   send_command(command);
 }
 
-void right(){
-  digitalWrite(right_pin, HIGH);
-  digitalWrite(left_pin, LOW);
-  digitalWrite(forward_pin, LOW);
-  digitalWrite(reverse_pin, LOW);
+typedef enum {LEFT, STRAIGHT, RIGHT} Direction;
+typedef enum {REVERSE, STOP, FORWARD} Throttle;
+
+typedef struct {
+    Direction direction;
+    Throttle throttle;
+} DriveCommand;
+
+void sendDriveCommand(DriveCommand command) {
+  digitalWrite(right_pin, command.direction == RIGHT ? HIGH : LOW);
+  digitalWrite(left_pin, command.direction == LEFT ? HIGH : LOW);
+  digitalWrite(forward_pin, command.throttle == FORWARD ? HIGH : LOW);
+  digitalWrite(reverse_pin, command.throttle == REVERSE ? HIGH : LOW);
   delay(time);
 }
 
-void left(){
-  digitalWrite(right_pin, LOW);
-  digitalWrite(left_pin, HIGH);
-  digitalWrite(forward_pin, LOW);
-  digitalWrite(reverse_pin, LOW);
-  delay(time);
+void right() {
+  sendDriveCommand((DriveCommand) {.direction=RIGHT, .throttle=STOP});
 }
 
-void forward(){
-  digitalWrite(right_pin, LOW);
-  digitalWrite(left_pin, LOW);
-  digitalWrite(forward_pin, HIGH);
-  digitalWrite(reverse_pin, LOW);
-  delay(time);
+void left() {
+  sendDriveCommand((DriveCommand) {.direction=LEFT, .throttle=STOP});
 }
 
-void reverse(){
-  digitalWrite(right_pin, LOW);
-  digitalWrite(left_pin, LOW);
-  digitalWrite(forward_pin, LOW);
-  digitalWrite(reverse_pin, HIGH);
-  delay(time);
+void forward() {
+  sendDriveCommand((DriveCommand) {.direction=STRAIGHT, .throttle=FORWARD});
 }
 
-void forward_right(){
-  digitalWrite(right_pin, HIGH);
-  digitalWrite(left_pin, LOW);
-  digitalWrite(forward_pin, HIGH);
-  digitalWrite(reverse_pin, LOW);
-  delay(time);
+void reverse() {
+  sendDriveCommand((DriveCommand) {.direction=STRAIGHT, .throttle=REVERSE});
 }
 
-void reverse_right(){
-  digitalWrite(right_pin, HIGH);
-  digitalWrite(left_pin, LOW);
-  digitalWrite(forward_pin, LOW);
-  digitalWrite(reverse_pin, HIGH);
-  delay(time);
+void forward_right() {
+  sendDriveCommand((DriveCommand) {.direction=RIGHT, .throttle=FORWARD});
 }
 
-void forward_left(){
-  digitalWrite(right_pin, LOW);
-  digitalWrite(left_pin, HIGH);
-  digitalWrite(forward_pin, HIGH);
-  digitalWrite(reverse_pin, LOW);
-  delay(time);
+void reverse_right() {
+  sendDriveCommand((DriveCommand) {.direction=RIGHT, .throttle=REVERSE});
 }
 
-void reverse_left(){
-  digitalWrite(right_pin, LOW);
-  digitalWrite(left_pin, HIGH);
-  digitalWrite(forward_pin, LOW);
-  digitalWrite(reverse_pin, HIGH);
-  delay(time);
+void forward_left() {
+  sendDriveCommand((DriveCommand) {.direction=LEFT, .throttle=FORWARD});
+}
+
+void reverse_left() {
+  sendDriveCommand((DriveCommand) {.direction=LEFT, .throttle=REVERSE});
 }
 
 void ignition() {
   digitalWrite(ignition_pin, HIGH);
   delay(time);
   digitalWrite(ignition_pin, LOW);
+  delay(time);
 }
 
 void horn() {
   digitalWrite(horn_pin, HIGH);
   delay(time);
   digitalWrite(horn_pin, LOW);
+  delay(time);
 }
 
-void reset(){
+void reset() {
   digitalWrite(right_pin, LOW);
   digitalWrite(left_pin, LOW);
   digitalWrite(forward_pin, LOW);
@@ -116,7 +102,7 @@ void reset(){
 void send_command(int command){
   switch (command){
 
-    //reset command
+    // reset command
     case 0: reset(); break;
 
     // single command
@@ -125,15 +111,15 @@ void send_command(int command){
     case 3: right(); break;
     case 4: left(); break;
 
-    //combination command
+    // combination command
     case 6: forward_right(); break;
     case 7: forward_left(); break;
     case 8: reverse_right(); break;
     case 9: reverse_left(); break;
 
     // special commands
-    case 11:ignition(); break;
-    case 12:horn(); break;
+    case 11: ignition(); break;
+    case 12: horn(); break;
 
     default: Serial.print("Invalid Command\n");
   }
