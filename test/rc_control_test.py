@@ -20,7 +20,7 @@ class RCTest(object):
         while self.send_inst:
             for event in pygame.event.get():
                 print(event)
-                if event.type == KEYDOWN:
+                if event.type == pygame.KEYDOWN:
                     key_input = pygame.key.get_pressed()
 
                     # complex orders
