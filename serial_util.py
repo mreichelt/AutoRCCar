@@ -1,4 +1,5 @@
 import glob
+from abc import ABCMeta, abstractmethod
 
 import serial
 
@@ -15,7 +16,61 @@ REVERSE_LEFT_BYTE = 9
 RESET_BYTE = 0
 
 
-class CarControl(serial.Serial):
+class CarControl:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def forward(self):
+        return NotImplemented
+
+    @abstractmethod
+    def reverse(self):
+        return NotImplemented
+
+    @abstractmethod
+    def right(self):
+        return NotImplemented
+
+    @abstractmethod
+    def left(self):
+        return NotImplemented
+
+    @abstractmethod
+    def forward_right(self):
+        return NotImplemented
+
+    @abstractmethod
+    def forward_left(self):
+        return NotImplemented
+
+    @abstractmethod
+    def reverse_right(self):
+        return NotImplemented
+
+    @abstractmethod
+    def reverse_left(self):
+        return NotImplemented
+
+    @abstractmethod
+    def reset_car(self):
+        return NotImplemented
+
+    @abstractmethod
+    def start(self):
+        return NotImplemented
+
+    @abstractmethod
+    def horn(self):
+        return NotImplemented
+
+
+class SerialCarControl(serial.Serial, CarControl):
+
+    def horn(self):
+        pass
+
+    def start(self):
+        pass
 
     # Normal movements
 
@@ -66,7 +121,7 @@ class CarControl(serial.Serial):
 
 def select_car():
     usb_device = select_usbmodem()
-    return CarControl(usb_device, 115200, timeout=1)
+    return SerialCarControl(usb_device, 115200, timeout=1)
 
 
 def select_usbmodem():
