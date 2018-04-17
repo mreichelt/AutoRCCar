@@ -13,6 +13,8 @@ FORWARD_LEFT_BYTE = 7
 REVERSE_RIGHT_BYTE = 8
 REVERSE_LEFT_BYTE = 9
 
+IGNITION_BYTE = 11
+
 RESET_BYTE = 0
 
 
@@ -70,7 +72,7 @@ class SerialCarControl(serial.Serial, CarControl):
         pass
 
     def start(self):
-        pass
+        self.write_single_byte(IGNITION_BYTE)
 
     # Normal movements
 
