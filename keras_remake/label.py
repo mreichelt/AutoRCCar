@@ -4,6 +4,7 @@ from pathlib import Path
 
 import cv2
 import pygame
+import pygame.locals
 
 NUM_KEYS = [getattr(pygame, 'K_' + str(num)) for num in range(10)]
 
@@ -40,7 +41,12 @@ def save(image, label, root=Path('labeled_images')):
 def await_key():
     while True:
         # noinspection PyArgumentList
-        for _ in pygame.event.get(pygame.KEYDOWN):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                raise KeyboardInterrupt
+            if not event.type == pygame.KEYDOWN:
+                continue
+            print('Keydown')
             pressed = pygame.key.get_pressed()
             pressed_nums = list(filter(lambda key: pressed[key], NUM_KEYS))
             if len(pressed_nums) == 1:
