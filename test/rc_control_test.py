@@ -4,7 +4,6 @@ from serial_util import select_car
 __author__ = 'zhengwang'
 
 import pygame
-from pygame.locals import *
 
 
 class RCTest(object):
@@ -57,6 +56,14 @@ class RCTest(object):
                     elif key_input[pygame.K_LEFT]:
                         print("Left")
                         self.car.left()
+
+                    elif key_input[pygame.K_RETURN]:
+                        print('HONK HONK')
+                        self.car.horn()
+
+                    elif key_input[pygame.K_SPACE]:
+                        print('Start/stop')
+                        self.car.start()
 
                     # exit
                     elif key_input[pygame.K_x] or key_input[pygame.K_q]:
