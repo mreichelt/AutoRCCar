@@ -129,7 +129,7 @@ def select_car():
 def select_usbmodem():
     usb_devices = glob.glob('/dev/tty.usbmodem*')
     if len(usb_devices) == 1:
-        print('Only one usbdevie found: %s. Using that one.' % usb_devices[0])
+        print('Only one USB device found: %s. Using that one.' % usb_devices[0])
         return usb_devices[0]
     print("Choose an USB port for the serial")
     for i, usb_device in enumerate(usb_devices):

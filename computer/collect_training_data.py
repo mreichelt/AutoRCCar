@@ -13,15 +13,14 @@ import time
 import os
 
 JPEG_START = np.array([0xff, 0xd8], dtype=np.uint8)
-JPED_END = np.array([0xff, 0xd9], dtype=np.uint8)
+JPEG_END = np.array([0xff, 0xd9], dtype=np.uint8)
 
 
 class CollectTrainingData(object):
 
     def __init__(self):
 
-        # connect to a seral port
-        # '/dev/tty.usbmodem1421'
+        # connect to a serial port, e.g. '/dev/tty.usbmodem1421'
         self.ser = serial.Serial(select_usbmodem(), 115200, timeout=1)
         self.send_inst = True
 
@@ -29,7 +28,7 @@ class CollectTrainingData(object):
         self.server_socket.bind(('0.0.0.0', 8000))
         self.server_socket.listen(0)
 
-        print('Waiting for incoming connection. My ip is: ' + get_my_ip())
+        print('Waiting for incoming connection. My IP is: ' + get_my_ip())
 
         # accept a single connection
         self.connection = self.server_socket.accept()[0].makefile('rb')
@@ -61,7 +60,7 @@ class CollectTrainingData(object):
             while self.send_inst:
                 stream_bytes = np.append(stream_bytes, np.fromstring(self.connection.read(8 * 1024), dtype=np.uint8))
                 first = find_subarray_np(stream_bytes, JPEG_START)
-                last = find_subarray_np(stream_bytes, JPED_END)
+                last = find_subarray_np(stream_bytes, JPEG_END)
                 if first is not None and last is not None:
                     jpg = stream_bytes[first:last + 2]
                     stream_bytes = stream_bytes[last + 2:]
