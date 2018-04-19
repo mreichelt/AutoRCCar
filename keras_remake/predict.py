@@ -16,7 +16,8 @@ def load_image(image: Union[np.ndarray, str]):
 
 class NeuralNetwork:
 
-    def __init__(self, model_path):
+    def __init__(self, model_path, output_mapping=lambda x: x):
+        self.output_mapping = output_mapping
         h5file = h5py.File(model_path, mode='r')
         model_version = h5file.attrs.get('keras_version')
         keras_version = str(keras.__version__).encode('utf8')
@@ -33,7 +34,14 @@ class NeuralNetwork:
     def predict(self, images: Union[List[np.ndarray], np.ndarray]):
         if isinstance(images, list):
             images = np.array(images)
-        return self.model.predict(images.reshape(images.shape[0], *(self.model.layers[0].input_shape[1:])))
+        return list(map(
+            self.output_mapping,
+            self.model.predict(
+                images.reshape(
+                    images.shape[0], *(self.model.layers[0].input_shape[1:])
+                )
+            )
+        ))
 
 
 def main():

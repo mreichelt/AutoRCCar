@@ -87,7 +87,8 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
     def __init__(self, request, client_address, server):
         self.rc_car = RCControl()
         atexit.register(self.rc_car.stop)
-        self.model = NeuralNetwork('models/default.h5')
+        self.model = NeuralNetwork('models/default.h5',
+                                   output_mapping=lambda prediction: (max(min(prediction, 9), 1) - 5) / 4)
         super().__init__(request, client_address, server)
 
     def handle(self):
@@ -111,7 +112,7 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
 
                         self.model.predict([cv2.imread("training_images/frame01094.jpg", cv2.IMREAD_GRAYSCALE)])
 
-                        prediction = (max(min(self.model.predict_single(gray), 9), 1) - 5) / 4
+                        prediction = self.model.predict_single(gray)
 
                         self.rc_car.steer(prediction, frame=frame,
                                           distance=sensor_data if sensor_data is not None else 3000)
