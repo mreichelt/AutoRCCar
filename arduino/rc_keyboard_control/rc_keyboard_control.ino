@@ -7,7 +7,7 @@ int ignition_pin = 10;
 int horn_pin = 11;
 
 // duration for output in milliseconds
-const int time = 50;
+const int time = 25;
 
 void setup() {
   pinMode(right_pin, OUTPUT);
@@ -74,6 +74,7 @@ void reset() {
   digitalWrite(left_pin, LOW);
   digitalWrite(forward_pin, LOW);
   digitalWrite(reverse_pin, LOW);
+  delay(time);
 }
 
 void send_command(int command){
