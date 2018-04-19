@@ -1,7 +1,9 @@
+from multiprocessing import Value
+
 from array_util import find_subarray_np
 from keras_remake.predict import NeuralNetwork
 from random_util import get_my_ip
-from serial_util import select_car
+from serial_util import select_car, Throttle, Direction
 
 __author__ = 'zhengwang'
 
@@ -12,10 +14,11 @@ import cv2.ml
 import numpy as np
 import atexit
 
-sensor_data = None
+sensor_data = Value('f', 3000)
 
 STEER_THRESHOLD = 0.3
-GAS_INTERVAL = 3
+GAS_INTERVAL = 2
+GAS_INTERVAL_LENGTH = 3
 
 
 class RCControl(object):
@@ -28,39 +31,44 @@ class RCControl(object):
     def steer(self, prediction, frame, distance):
         print(end="%05d: " % frame)
 
-        if self.last_distance >= 25 > distance:
-            self.car.horn()
-        self.last_distance = distance
+        car = self.car
 
-        if distance < 20:
+        # honk if too close
+        if self.object_is_getting_close(distance):
+            car.horn()
+
+        if self.is_obstacle_too_close(distance):
             print('stop, because of obstacle')
-            self.car.reset_car()
+            car.reset_car()
             return
 
-        if prediction < -STEER_THRESHOLD:
-            if frame % GAS_INTERVAL != 0:
-                print('left')
-                self.car.left()
-            else:
-                print('forward left')
-                self.car.forward_left()
-        elif prediction > STEER_THRESHOLD:
-            if frame % GAS_INTERVAL != 0:
-                print('right')
-                self.car.right()
-            else:
-                print('forward right')
-                self.car.forward_right()
-        else:
-            if frame % GAS_INTERVAL != 0:
-                self.car.reset_car()
-                print("stop")
-            else:
-                self.car.forward()
-                print("Forward")
+        direction = self.convert_to_direction(prediction)
+        throttle = self.compute_throttle(frame)
+
+        # car.steer(RIGHT, FORWARD)
+        print(throttle.name, '\t', direction.name)
+        car.steer(direction, throttle)
 
     def stop(self):
         self.car.reset_car()
+
+    def object_is_getting_close(self, distance):
+        is_getting_closer = self.last_distance > 30 and self.is_obstacle_too_close(distance)
+        self.last_distance = distance
+        return is_getting_closer
+
+    @staticmethod
+    def is_obstacle_too_close(distance):
+        return distance <= 30
+
+    @staticmethod
+    def convert_to_direction(prediction):
+        return Direction.RIGHT if prediction > STEER_THRESHOLD else (Direction.LEFT if prediction < -STEER_THRESHOLD
+                                                                     else Direction.STRAIGHT)
+
+    @staticmethod
+    def compute_throttle(frame, gas_interval_length=GAS_INTERVAL_LENGTH, gas_interval=GAS_INTERVAL):
+        return Throttle.STOP if frame // gas_interval_length % gas_interval != 0 else Throttle.FORWARD
 
 
 class SensorDataHandler(socketserver.BaseRequestHandler):
@@ -71,9 +79,13 @@ class SensorDataHandler(socketserver.BaseRequestHandler):
         try:
             while self.data:
                 self.data = self.request.recv(1024)
-                sensor_data = round(float(self.data), 1)
-                # print "{} sent:".format(self.client_address[0])
-                print('Got sensor data:', sensor_data)
+                try:
+                    value = round(float(self.data), 1)
+                    sensor_data.value = value
+                    # print "{} sent:".format(self.client_address[0])
+                    print('Got sensor data:', value)
+                except ValueError:
+                    print('Got sensor data too fast')
         finally:
             print("Connection closed on thread 2")
 
@@ -110,12 +122,10 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
                         stream_bytes = stream_bytes[last + 2:]
                         gray = cv2.imdecode(jpg, cv2.IMREAD_GRAYSCALE)
 
-                        self.model.predict([cv2.imread("training_images/frame01094.jpg", cv2.IMREAD_GRAYSCALE)])
-
                         prediction = self.model.predict_single(gray)
 
                         self.rc_car.steer(prediction, frame=frame,
-                                          distance=sensor_data if sensor_data is not None else 3000)
+                                          distance=sensor_data.value)
 
                         frame += 1
 
@@ -123,8 +133,8 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
 
         finally:
             self.rc_car.stop()
-            cv2.destroyAllWindows()
-            print("Connection closed on thread 1")
+        cv2.destroyAllWindows()
+        print("Connection closed on thread 1")
 
 
 class ThreadServer(object):
