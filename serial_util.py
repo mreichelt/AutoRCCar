@@ -1,5 +1,6 @@
 import glob
 from abc import ABCMeta, abstractmethod
+from enum import Enum, auto
 
 import serial
 
@@ -16,6 +17,18 @@ REVERSE_LEFT_BYTE = 9
 IGNITION_BYTE = 11
 
 RESET_BYTE = 0
+
+
+class Direction(Enum):
+    LEFT = auto()
+    STRAIGHT = auto()
+    RIGHT = auto()
+
+
+class Throttle(Enum):
+    FORWARD = auto()
+    STOP = auto()
+    REVERSE = auto()
 
 
 class CarControl:
@@ -65,8 +78,37 @@ class CarControl:
     def horn(self):
         return NotImplemented
 
+    @abstractmethod
+    def steer(self, direction, throttle):
+        return NotImplemented
+
 
 class SerialCarControl(serial.Serial, CarControl):
+
+    def steer(self, direction, throttle):
+        if throttle == Throttle.FORWARD:
+            if direction == Direction.LEFT:
+                self.forward_left()
+            elif direction == Direction.STRAIGHT:
+                self.forward()
+            elif direction == Direction.RIGHT:
+                self.forward_right()
+
+        elif throttle == Throttle.STOP:
+            if direction == Direction.LEFT:
+                self.left()
+            elif direction == Direction.STRAIGHT:
+                self.reset_car()
+            elif direction == Direction.RIGHT:
+                self.right()
+
+        elif throttle == Throttle.REVERSE:
+            if direction == Direction.LEFT:
+                self.reverse_left()
+            elif direction == Direction.STRAIGHT:
+                self.reverse()
+            elif direction == Direction.RIGHT:
+                self.reverse_right()
 
     def horn(self):
         print('\a' * 20)
