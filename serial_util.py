@@ -77,37 +77,29 @@ class SerialCarControl(serial.Serial, CarControl):
     # Normal movements
 
     def forward(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(FORWARD_BYTE)
 
     def reverse(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(REVERSE_BYTE)
 
     def right(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(RIGHT_BYTE)
 
     def left(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(LEFT_BYTE)
 
     # Complex movements
 
     def forward_right(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(FORWARD_RIGHT_BYTE)
 
     def forward_left(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(FORWARD_LEFT_BYTE)
 
     def reverse_right(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(REVERSE_RIGHT_BYTE)
 
     def reverse_left(self):
-        self.write_single_byte(RESET_BYTE)
         self.write_single_byte(REVERSE_LEFT_BYTE)
 
     # Reset
