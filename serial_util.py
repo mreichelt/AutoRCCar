@@ -69,7 +69,7 @@ class CarControl:
 class SerialCarControl(serial.Serial, CarControl):
 
     def horn(self):
-        pass
+        print('\a' * 20)
 
     def start(self):
         self.write_single_byte(IGNITION_BYTE)
