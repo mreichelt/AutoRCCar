@@ -91,7 +91,7 @@ class SensorDataHandler(socketserver.BaseRequestHandler):
 
 
 JPEG_START = np.array([0xff, 0xd8], dtype=np.uint8)
-JPED_END = np.array([0xff, 0xd9], dtype=np.uint8)
+JPEG_END = np.array([0xff, 0xd9], dtype=np.uint8)
 
 
 class VideoStreamHandler(socketserver.StreamRequestHandler):
@@ -116,7 +116,7 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
                 if first is None:
                     first = find_subarray_np(stream_bytes, JPEG_START)
                 if first is not None:
-                    last = find_subarray_np(stream_bytes, JPED_END)
+                    last = find_subarray_np(stream_bytes, JPEG_END)
                     if last is not None:
                         jpg = stream_bytes[first:last + 2]
                         stream_bytes = stream_bytes[last + 2:]
