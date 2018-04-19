@@ -6,11 +6,8 @@ int reverse_pin = 3;
 int ignition_pin = 10;
 int horn_pin = 11;
 
-// duration for output
+// duration for output in milliseconds
 const int time = 50;
-
-// initial command
-int command = 0;
 
 void setup() {
   pinMode(right_pin, OUTPUT);
@@ -21,6 +18,7 @@ void setup() {
 }
 
 void loop() {
+  int command = 0;
   // receive command
   if (Serial.available() > 0){
     command = Serial.read();
@@ -33,10 +31,21 @@ void loop() {
 typedef enum {LEFT, STRAIGHT, RIGHT} Direction;
 typedef enum {REVERSE, STOP, FORWARD} Throttle;
 
-typedef struct {
+struct DriveCommand {
     Direction direction;
     Throttle throttle;
-} DriveCommand;
+};
+
+const DriveCommand C_LEFT = {.direction=LEFT, .throttle=STOP};
+const DriveCommand C_RIGHT = {.direction=RIGHT, .throttle=STOP};
+const DriveCommand C_FORWARD = {.direction=STRAIGHT, .throttle=FORWARD};
+const DriveCommand C_REVERSE = {.direction=STRAIGHT, .throttle=REVERSE};
+const DriveCommand C_FORWARD_LEFT = {.direction=LEFT, .throttle=FORWARD};
+const DriveCommand C_FORWARD_RIGHT = {.direction=RIGHT, .throttle=FORWARD};
+const DriveCommand C_REVERSE_LEFT = {.direction=LEFT, .throttle=REVERSE};
+const DriveCommand C_REVERSE_RIGHT = {.direction=RIGHT, .throttle=REVERSE};
+
+void sendDriveCommand(DriveCommand command);
 
 void sendDriveCommand(DriveCommand command) {
   digitalWrite(right_pin, command.direction == RIGHT ? HIGH : LOW);
@@ -44,38 +53,6 @@ void sendDriveCommand(DriveCommand command) {
   digitalWrite(forward_pin, command.throttle == FORWARD ? HIGH : LOW);
   digitalWrite(reverse_pin, command.throttle == REVERSE ? HIGH : LOW);
   delay(time);
-}
-
-void right() {
-  sendDriveCommand((DriveCommand) {.direction=RIGHT, .throttle=STOP});
-}
-
-void left() {
-  sendDriveCommand((DriveCommand) {.direction=LEFT, .throttle=STOP});
-}
-
-void forward() {
-  sendDriveCommand((DriveCommand) {.direction=STRAIGHT, .throttle=FORWARD});
-}
-
-void reverse() {
-  sendDriveCommand((DriveCommand) {.direction=STRAIGHT, .throttle=REVERSE});
-}
-
-void forward_right() {
-  sendDriveCommand((DriveCommand) {.direction=RIGHT, .throttle=FORWARD});
-}
-
-void reverse_right() {
-  sendDriveCommand((DriveCommand) {.direction=RIGHT, .throttle=REVERSE});
-}
-
-void forward_left() {
-  sendDriveCommand((DriveCommand) {.direction=LEFT, .throttle=FORWARD});
-}
-
-void reverse_left() {
-  sendDriveCommand((DriveCommand) {.direction=LEFT, .throttle=REVERSE});
 }
 
 void ignition() {
@@ -106,16 +83,16 @@ void send_command(int command){
     case 0: reset(); break;
 
     // single command
-    case 1: forward(); break;
-    case 2: reverse(); break;
-    case 3: right(); break;
-    case 4: left(); break;
+    case 1: sendDriveCommand(C_FORWARD); break;
+    case 2: sendDriveCommand(C_REVERSE); break;
+    case 3: sendDriveCommand(C_RIGHT); break;
+    case 4: sendDriveCommand(C_LEFT); break;
 
     // combination command
-    case 6: forward_right(); break;
-    case 7: forward_left(); break;
-    case 8: reverse_right(); break;
-    case 9: reverse_left(); break;
+    case 6: sendDriveCommand(C_FORWARD_RIGHT); break;
+    case 7: sendDriveCommand(C_FORWARD_LEFT); break;
+    case 8: sendDriveCommand(C_REVERSE_RIGHT); break;
+    case 9: sendDriveCommand(C_REVERSE_LEFT); break;
 
     // special commands
     case 11: ignition(); break;
