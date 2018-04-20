@@ -8,8 +8,9 @@ def drive_model():
         Cropping2D(cropping=((110, 0), (0, 0)), input_shape=(240, 320, 1)),
 
         # convolutional layers + pooling
-        Convolution2D(24, 3, 3, activation='relu', subsample=(2, 2)),
-        Convolution2D(36, 3, 3, activation='relu', subsample=(2, 2)),
+        Convolution2D(24, 3, 1, activation='relu', subsample=(2, 2)),
+        Convolution2D(36, 3, 1, activation='relu', subsample=(2, 2)),
+        Convolution2D(48, 3, 1, activation='relu', subsample=(2, 2)),
         # Convolution2D(48, 3, 3, activation='relu', subsample=(2, 2)),
         # Convolution2D(64, 3, 1, activation='relu'),
         # Convolution2D(64, 3, 1, activation='relu'),

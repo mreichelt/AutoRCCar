@@ -17,7 +17,7 @@ def training_drive():
     print(drive_model.summary())
     cvscores = []
 
-    history = drive_model.fit(train_features, train_labels, epochs=5, validation_split=0.2)
+    history = drive_model.fit(train_features, train_labels, epochs=20, validation_split=0.2)
 
     drive_model.save('drive.h5')
 
@@ -65,5 +65,5 @@ def training_brake():
 
 
 if __name__ == '__main__':
-    # training_brake()
     training_drive()
+    # training_brake()
